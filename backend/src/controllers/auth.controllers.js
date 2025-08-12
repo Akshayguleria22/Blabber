@@ -47,16 +47,17 @@ export const logInController =async (req,res) => {
     try {
         const user = await User.findOne({ email })
         if (!user) {
-            return res.status(400).json({ message: "Invalid Credentials" })
+            return res.status(400).json({ message: "User not found" })
         }
         const isPasswordCorrect= await bcrypt.compare(password,user.password)
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Invalid Credentials" })
+            return res.status(400).json({ message: "Invalid Password" })
         }
         generateToken(user._id, res);
         res.status(200).json({
             _id: user._id,
-            fullName: user.fullName,
+            firstname: user.firstname,
+            lastname: user.lastname,
             email: user.email,
             profilePic:user.profilePic,
         })
@@ -77,7 +78,7 @@ export const logOutController =async (req,res) => {
     }
 }
 
-export const updateProfile = async (req, res) => {
+export const updateprofile = async (req, res) => {
     try {
         const { profilePic } = req.body
         const userId = req.user._id
@@ -87,7 +88,7 @@ export const updateProfile = async (req, res) => {
 
         const uploadResponse = await cloudinary.uploader.upload(profilePic)
         
-        const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true })
+        const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true }).select("-password");
         
         res.status(200).json(updatedUser)
     } catch (error) {

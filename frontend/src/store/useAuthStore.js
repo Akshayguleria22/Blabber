@@ -6,7 +6,6 @@ export const useAuthStore = create((set) => ({
     isSigningUp: false,
     isLoggingIng: false,
     isUpdatingProfile: false,
-    
     isCheckingAuth: true,
 
     checkAuth: async () => {
@@ -18,6 +17,19 @@ export const useAuthStore = create((set) => ({
             console.log("Error in checkAuth", error)
         } finally {
             set({ isCheckingAuth: false })
+        }
+    },
+
+    login: async (data) => {
+        set({ isLoggingIn: true });
+        try {
+            const res = await axiosInstance.post("/auth/login", data);
+            set({ authUser: res.data });
+            toast.success("Logged in successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isLoggingIn: false });
         }
     },
 
@@ -43,5 +55,19 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             toast.error(error.response.data.message)
         }
-    }
+    },
+
+    updateprofile: async (data) => {
+        set({ isUpdatingProfile: true });
+        try {
+            const res = await axiosInstance.put("/auth/update-profile", data);
+            set({ authUser: res.data });
+            toast.success("Profile updated successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isUpdatingProfile: false });
+        }
+    },
+
 }))

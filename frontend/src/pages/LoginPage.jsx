@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { cn } from "../lib/utils";
 import { useAuthStore } from "../store/useAuthStore.js";
 import { useState } from 'react'
-import { Eye, EyeOff,Loader,Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader, Loader2 } from 'lucide-react';
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -19,10 +19,11 @@ const LoginPage = () => {
     password: "",
   });
 
-  const isLoginggIng=useAuthStore()
+  const { isLoggingIng, login
+  } = useAuthStore()
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted");
+    login(formData);
   };
   return (
     <div className="flex items-center justify-center h-193">
@@ -37,11 +38,11 @@ const LoginPage = () => {
         <form className="my-8" onSubmit={handleSubmit}>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="email">Email Address</Label>
-            <Input id="email" placeholder="projectmayhem@fc.com" type="email" />
+            <Input id="email" placeholder="projectmayhem@fc.com" type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" placeholder="••••••••" type={showPass ? "text" : "password"} />
+            <Input id="password" placeholder="••••••••" type={showPass ? "text" : "password"} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
             <button type="button" className="relative w-2 h-0 bottom-10 left-85" onClick={() => setShowPass(!showPass)}>
               {showPass ? (
                 <EyeOff className="size-5 text-base-content/40" />
@@ -54,16 +55,16 @@ const LoginPage = () => {
 
           <button
             className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
-            type="submit" disabled={isSigningUp}>
+            type="submit" disabled={isLoggingIng}>
             {
-              !isSigningUp ? (
-                <>
+              isLoggingIng ? (
+                <div className="flex items-center justify-center space-x-2">
                   <Loader2 className="size-5 animate-spin" />
-                  Loading...
-                </>
+                  <h2 className="text-gray-200">Loading...</h2>
+                </div>
               ) : (<div>Log In &rarr;</div>)
             }
-            
+
             <BottomGradient />
           </button>
 

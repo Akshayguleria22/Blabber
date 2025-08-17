@@ -1,11 +1,21 @@
 import React from 'react'
-import { useAuthStore } from '../store/useAuthStore.js'
-
+import { useChatStore } from '../store/useChatStore.js'
+import Sidebar from '../components/Sidebar.jsx'
+import NoChatSelected from '../components/NoChatSelected.jsx'
+import ChatWindow from '../components/ChatWindow.jsx'
 const HomePage = () => {
-  const {authUser}=useAuthStore()
+  const { selectedUser } = useChatStore()
   return (
-    <div>
-      hello
+    <div className="h-screen bg-base-200">
+      <div className="flex items-center justify-center pt-20 px-4">
+        <div className="bg-base-100 rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]">
+          <div className="flex h-full rounded-lg overflow-hidden">
+            <Sidebar />
+            {!selectedUser ? <NoChatSelected /> : <ChatWindow />}
+
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

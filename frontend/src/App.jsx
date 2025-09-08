@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from "./components/Navbar"
 import { Routes, Route } from "react-router-dom"
 import HomePage from "./pages/HomePage"
+import LandingPage from "./pages/LandingPage"
 import Settings from "./pages/Settings"
 import SignUpPage from "./pages/SignUpPage.jsx"
 import LoginPage from "./pages/LoginPage"
@@ -33,7 +34,7 @@ function App() {
 
 
         <Routes>
-          <Route path="/" element={authUser? <HomePage/>:<Navigate to="/login"/>} />
+          <Route path="/" element={authUser? <HomePage/>:<LandingPage/>} />
           <Route path="/signup" element={!authUser?<SignUpPage/>:<Navigate to="/"/>} />
           <Route path="/login" element={!authUser?<LoginPage/>:<Navigate to="/"/>} />
           <Route path="/settings" element={<Settings/>} />

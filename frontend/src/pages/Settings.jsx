@@ -2,9 +2,8 @@ import React, { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore.js'
 import { toast } from 'react-hot-toast'
 
-const themes = [
-  "retro", "light", "dark", "cupcake", "dracula", "bumblebee", "emerald", "corporate"
-]
+// Align with configured DaisyUI themes
+const themes = ["light", "dark", "retro"]
 
 const Settings = () => {
   const { authUser, updateProfile, isUpdatingProfile } = useAuthStore()
@@ -42,11 +41,12 @@ const Settings = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-8 bg-base-200 rounded-2xl shadow-xl">
-      <h2 className="text-3xl font-extrabold mb-8 text-center">Settings</h2>
-      <div className="flex flex-col md:flex-row gap-8">
+    <div className="max-w-4xl mx-auto mt-20 p-6 sm:p-8">
+      <h2 className="text-3xl font-extrabold mb-6 text-center">Settings</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Card */}
-        <div className="flex-1 bg-base-100 rounded-xl shadow p-6 flex flex-col items-center">
+        <div className="card bg-base-100 shadow">
+          <div className="card-body items-center">
           <div className="avatar mb-4">
             <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
               <img src={profilePic || authUser?.profilePic} alt="User" />
@@ -71,10 +71,12 @@ const Settings = () => {
               {isUpdatingProfile ? "Updating..." : "Update Picture"}
             </button>
           </form>
+          </div>
         </div>
 
         {/* Settings Card */}
-        <form onSubmit={handleSettingsSave} className="flex-1 bg-base-100 rounded-xl shadow p-6 space-y-6">
+        <form onSubmit={handleSettingsSave} className="card bg-base-100 shadow">
+          <div className="card-body space-y-6">
           <div>
             <label className="block mb-2 font-semibold">Theme</label>
             <select
@@ -109,9 +111,12 @@ const Settings = () => {
               />
             </label>
           </div>
-          <button className="btn btn-accent w-full mt-4" type="submit">
-            Save Settings
-          </button>
+          <div className="card-actions">
+            <button className="btn btn-accent w-full" type="submit">
+              Save Settings
+            </button>
+          </div>
+          </div>
         </form>
       </div>
     </div>

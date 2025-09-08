@@ -19,7 +19,7 @@ const LoginPage = () => {
     password: "",
   });
 
-  const { isLoggingIng, login
+  const { isLoggingIn, isLoggingIng, login
   } = useAuthStore()
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -55,9 +55,9 @@ const LoginPage = () => {
 
           <button
             className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
-            type="submit" disabled={isLoggingIng}>
+            type="submit" disabled={isLoggingIn || isLoggingIng}>
             {
-              isLoggingIng ? (
+              (isLoggingIn || isLoggingIng) ? (
                 <div className="flex items-center justify-center space-x-2">
                   <Loader2 className="size-5 animate-spin" />
                   <h2 className="text-gray-200">Loading...</h2>

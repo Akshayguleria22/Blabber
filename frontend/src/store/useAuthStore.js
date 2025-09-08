@@ -4,6 +4,8 @@ import toast from 'react-hot-toast'
 export const useAuthStore = create((set) => ({
     authUser: null,
     isSigningUp: false,
+    isLoggingIn: false,
+    // Back-compat for existing components that might read the old key
     isLoggingIng: false,
     isUpdatingProfile: false,
     isCheckingAuth: true,
@@ -21,7 +23,7 @@ export const useAuthStore = create((set) => ({
     },
 
     login: async (data) => {
-        set({ isLoggingIn: true });
+        set({ isLoggingIn: true, isLoggingIng: true });
         try {
             const res = await axiosInstance.post("/auth/login", data);
             set({ authUser: res.data });
@@ -29,7 +31,7 @@ export const useAuthStore = create((set) => ({
         } catch (error) {
             toast.error(error.response.data.message);
         } finally {
-            set({ isLoggingIn: false });
+            set({ isLoggingIn: false, isLoggingIng: false });
         }
     },
 
@@ -58,6 +60,20 @@ export const useAuthStore = create((set) => ({
     },
 
     updateprofile: async (data) => {
+        set({ isUpdatingProfile: true });
+        try {
+            const res = await axiosInstance.put("/auth/update-profile", data);
+            set({ authUser: res.data });
+            toast.success("Profile updated successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isUpdatingProfile: false });
+        }
+    },
+
+    // Preferred naming used by components
+    updateProfile: async (data) => {
         set({ isUpdatingProfile: true });
         try {
             const res = await axiosInstance.put("/auth/update-profile", data);

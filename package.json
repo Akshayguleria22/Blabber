@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run start --prefix backend",
-    "build": "npm install --prefix frontend && npm run build --prefix frontend && npm run build --prefix frontend",
-    "postinstall": "npm ci --prefix backend && npm ci --prefix frontend"
+    "build": "npm install --prefix frontend && npm run build --prefix frontend && npm run build --prefix frontend"
   },
   "repository": {
     "type": "git",
@@ -20,6 +19,5 @@
   "bugs": {
     "url": "https://github.com/Akshayguleria22/Blabber/issues"
   },
-  "homepage": "https://github.com/Akshayguleria22/Blabber#readme",
-  "private": true
+  "homepage": "https://github.com/Akshayguleria22/Blabber#readme"
 }

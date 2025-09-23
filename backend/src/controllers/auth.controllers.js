@@ -106,3 +106,13 @@ export const checkAuth = (req, res) => {
         res.status(500).json({message:"Internal server error"})
     }
 }
+
+export const oauthSuccessController = (req, res) => {
+    // user is set by passport strategy
+    const user = req.user;
+    if (!user) return res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/login?error=oauth`);
+    generateToken(user._id, res);
+    // redirect back to app
+    const to = process.env.CLIENT_URL || "http://localhost:5173";
+    return res.redirect(to);
+};

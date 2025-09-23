@@ -12,7 +12,7 @@ const HomePage = () => {
           <div className="flex h-full rounded-lg overflow-hidden">
             <Sidebar />
             {!selectedUser ? <NoChatSelected /> : <ChatWindow />}
-
+            
           </div>
         </div>
       </div>

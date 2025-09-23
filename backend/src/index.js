@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 
 app.use('/api/auth', authRouter);
-app.use('/api/message', messageRouter);
+app.use('/api/messages', messageRouter);
 
 connectDB().then(() => {
     app.listen(PORT, () => {

@@ -1,0 +1,23 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "A modern, full‑stack real‑time chat application with authentication (email/password + Google/GitHub OAuth), online presence, media messaging, theming, and a clean UI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run start --prefix backend",
+    "build":"npm install --prefix frontend && npm run build --prefix frontend && npm run build --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Akshayguleria22/Blabber.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Akshayguleria22/Blabber/issues"
+  },
+  "homepage": "https://github.com/Akshayguleria22/Blabber#readme"
+}

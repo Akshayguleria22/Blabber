@@ -14,6 +14,7 @@
     "@tabler/icons-react": "^3.34.1",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
+    "chatapp": "file:..",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "motion": "^12.23.6",

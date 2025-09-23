@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import path from 'path';
 dotenv.config();
 
 import http from 'http';
@@ -13,7 +14,7 @@ import { validateEnv } from './lib/validateEnv.js';
 
 const app = express();
 const server = http.createServer(app);
-
+const _dirname = path.resolve();
 validateEnv();
 
 const ORIGINS = [
@@ -35,6 +36,16 @@ app.use(passport.initialize());
 app.use('/api/auth', authRouter);
 app.use('/api/messages', messageRouter);
 
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(_dirname, '../frontend/dist')));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(_dirname, '../frontend/dist', 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.send('API is running....');
+    });
+}
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
     server.listen(PORT, () => {

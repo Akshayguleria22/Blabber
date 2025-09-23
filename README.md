@@ -1,4 +1,4 @@
-# ChatApp
+# Blabber
 
 A modern, full‑stack real‑time chat application with authentication (email/password + Google/GitHub OAuth), online presence, media messaging, theming, and a clean UI.
 

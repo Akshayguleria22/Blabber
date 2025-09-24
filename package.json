@@ -1,24 +1,13 @@
 {
-  "name": "chatapp",
+  "name": "blabber",
   "version": "1.0.0",
-  "private": true,
-  "description": "Real-time chat app",
-  "type": "module",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "build": "npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend",
-    "start": "node backend/src/index.js",
-    "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npm run dev --prefix frontend"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Akshayguleria22/Blabber.git"
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Akshayguleria22/Blabber/issues"
-  },
-  "homepage": "https://github.com/Akshayguleria22/Blabber#readme"
+  "license": "ISC"
 }

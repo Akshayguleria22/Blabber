@@ -20,11 +20,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 validateEnv();
 
-const ORIGINS = [
-    process.env.CLIENT_URL,
-    "http://localhost:5173",
-    "http://localhost:5174",
-].filter(Boolean);
+// Centralized environment aware URLs
+const CLIENT_URL = process.env.CLIENT_URL || (process.env.NODE_ENV === 'production'
+    ? 'https://blabber-5anu.onrender.com'
+    : 'http://localhost:5173');
+const SERVER_URL = process.env.SERVER_URL || (process.env.NODE_ENV === 'production'
+    ? 'https://blabber-5anu-backend.onrender.com'
+    : 'http://localhost:5000');
+
+const ORIGINS = [CLIENT_URL, 'http://localhost:5173', 'http://localhost:5174']
+    .filter(Boolean)
+    .filter((v, i, a) => a.indexOf(v) === i); // de-dupe
 
 app.use(cors({
     origin: ORIGINS,
@@ -39,24 +45,62 @@ app.use(passport.initialize());
 app.use('/api/auth', authRouter);
 app.use('/api/messages', messageRouter);
 
-// Frontend static serving (production build) only if dist exists
+// Frontend static serving (production build) only if dist exists.
+// If deploying frontend separately (e.g. Render Static Site), we gracefully redirect or respond.
 const distPath = path.join(__dirname, '../../frontend/dist');
 const distExists = fs.existsSync(distPath);
+console.log('[static] expecting frontend dist at:', distPath, 'exists:', distExists);
 if (distExists) {
     app.use(express.static(distPath));
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api')) return next();
+    // SPA fallback for client-side routing
+    app.get(['/', '/dashboard', '/login', '/signup', '/profile', '/settings', '/chat', '/chat/*'], (req, res) => {
         const indexFile = path.join(distPath, 'index.html');
-        return fs.existsSync(indexFile)
-            ? res.sendFile(indexFile)
-            : res.status(500).json({ message: 'Frontend build missing index.html. Rebuild frontend.' });
+        if (fs.existsSync(indexFile)) return res.sendFile(indexFile);
+        return res.status(500).json({ message: 'Frontend build missing index.html. Rebuild frontend.' });
     });
 } else {
-    console.warn('[startup] Frontend dist folder not found. Run build: cd frontend && npm run build');
+    console.warn('[startup] Frontend dist folder not found. If this is intentional (separate deployment), root will redirect to CLIENT_URL.');
+    // Root redirect (only if different host) else simple message
+    app.get('/', (req, res) => {
+        const hostHeader = req.headers.host || '';
+        const clientHost = (() => {
+            try { return new URL(CLIENT_URL).host; } catch { return ''; }
+        })();
+        if (clientHost && clientHost !== hostHeader) {
+            return res.redirect(CLIENT_URL);
+        }
+        return res.json({
+            message: 'Backend running. Frontend dist not present here.',
+            client: CLIENT_URL,
+            server: SERVER_URL,
+        });
+    });
 }
 
+// Always provide an API root for diagnostics
+app.get('/api', (_req, res) => {
+    res.json({
+        status: 'ok',
+        server: SERVER_URL,
+        client: CLIENT_URL,
+        distExists,
+        time: new Date().toISOString()
+    });
+});
+
+// Final catch-all to avoid 'Cannot GET /' if a route slips through (non-API)
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) return res.status(404).json({ message: 'API route not found' });
+    if (distExists) {
+        const indexFile = path.join(distPath, 'index.html');
+        if (fs.existsSync(indexFile)) return res.sendFile(indexFile);
+    }
+    // Fallback JSON (separate deployment scenario)
+    return res.status(200).json({ message: 'Frontend not served from this backend.', client: CLIENT_URL });
+});
+
 // Simple health route
-app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/health', (_req, res) => res.json({ status: 'ok', server: SERVER_URL }));
 
 // Global error handler
 // eslint-disable-next-line no-unused-vars

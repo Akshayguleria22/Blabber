@@ -13,9 +13,11 @@ import authRouter from './routes/auth.routes.js';
 import messageRouter from './routes/message.routes.js';
 import { connectDB } from './lib/utils.js';
 import { validateEnv } from './lib/validateEnv.js';
+import { Server } from 'socket.io';
 
 const app = express();
 const server = http.createServer(app);
+let io;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 validateEnv();
@@ -44,6 +46,16 @@ app.use(passport.initialize());
 
 app.use('/api/auth', authRouter);
 app.use('/api/messages', messageRouter);
+app.get('/api/diagnostics', (_req, res) => {
+    res.json({
+        status: 'ok',
+        distExists: fs.existsSync(path.join(__dirname, '../../frontend/dist')),
+        nodeEnv: process.env.NODE_ENV,
+        origins: ORIGINS,
+        mongoUrlProvided: Boolean(process.env.MONGODB_URL || process.env.MONGODB_URI),
+        time: new Date().toISOString()
+    });
+});
 
 // Frontend static serving (production build) only if dist exists.
 // If deploying frontend separately (e.g. Render Static Site), we gracefully redirect or respond.
@@ -116,6 +128,32 @@ function startServer(port, attempt = 0) {
     server.listen(port, () => {
         console.log(`Server is running on port ${port}`);
         console.log('CORS origins:', ORIGINS);
+        // Initialize socket.io once
+        if (!io) {
+            io = new Server(server, {
+                cors: {
+                    origin: ORIGINS,
+                    credentials: true,
+                    methods: ['GET', 'POST']
+                }
+            });
+            const userSocketMap = {};
+            io.on('connection', (socket) => {
+                const userId = socket.handshake.query.userId;
+                if (userId) userSocketMap[userId] = socket.id;
+                io.emit('getOnlineUsers', Object.keys(userSocketMap));
+                socket.on('send_message', (data) => {
+                    const receiverSocketId = userSocketMap[data.to];
+                    if (receiverSocketId) io.to(receiverSocketId).emit('receive_message', data);
+                    else io.emit('receive_message', data);
+                });
+                socket.on('disconnect', () => {
+                    if (userId) delete userSocketMap[userId];
+                    io.emit('getOnlineUsers', Object.keys(userSocketMap));
+                });
+            });
+            console.log('[socket.io] initialized');
+        }
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE' && attempt < 3) {
             const nextPort = port + 1;

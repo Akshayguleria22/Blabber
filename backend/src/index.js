@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
 dotenv.config();
 
 import http from 'http';
@@ -14,7 +15,8 @@ import { validateEnv } from './lib/validateEnv.js';
 
 const app = express();
 const server = http.createServer(app);
-const _dirname = path.resolve();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 validateEnv();
 
 const ORIGINS = [
@@ -36,16 +38,15 @@ app.use(passport.initialize());
 app.use('/api/auth', authRouter);
 app.use('/api/messages', messageRouter);
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(_dirname, '../frontend/dist')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(_dirname, '../frontend/dist', 'index.html'));
-    });
-} else {
-    app.get('/', (req, res) => {
-        res.send('API is running....');
-    });
-}
+// Serve frontend if dist exists
+const distPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(distPath));
+
+app.get('*', (req, res) => {
+    if (req.path.startsWith('/api')) return res.status(404).json({ message: 'Not found' });
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
     server.listen(PORT, () => {

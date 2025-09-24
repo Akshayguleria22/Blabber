@@ -14,7 +14,6 @@
     "@tabler/icons-react": "^3.34.1",
     "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.11.0",
-    "chatapp": "file:..",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
     "motion": "^12.23.6",
@@ -25,14 +24,14 @@
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "daisyui": "^5.0.50"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
-    "daisyui": "^5.0.50",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

@@ -5,7 +5,7 @@ import { Input } from "./ui/input";
 import { cn } from "../lib/utils";
 import { useAuthStore } from "../store/useAuthStore.js";
 import { useState } from 'react'
-import { Eye, EyeOff, Loader, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import {
   IconBrandGithub,
   IconBrandGoogle,
@@ -36,7 +36,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-193">
+    <div className="flex items-center justify-center min-h-screen py-10">
       <div
         className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
         <h2 className="text-xl text-center font-bold text-neutral-800 dark:text-neutral-200">
@@ -52,14 +52,30 @@ const LoginPage = () => {
           </LabelInputContainer>
           <LabelInputContainer className="mb-4">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" placeholder="••••••••" type={showPass ? "text" : "password"} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
-            <button type="button" className="relative w-2 h-0 bottom-10 left-85" onClick={() => setShowPass(!showPass)}>
-              {showPass ? (
-                <EyeOff className="size-5 text-base-content/40" />
-              ) : (
-                <Eye className="size-5 text-base-content/40" />
-              )}
-            </button>
+            <div className="relative">
+              <Input
+                id="password"
+                placeholder="••••••••"
+                type={showPass ? "text" : "password"}
+                value={formData.password}
+                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                className="pr-10"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                aria-label={showPass ? 'Hide password' : 'Show password'}
+                title={showPass ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPass(!showPass)}
+                className="absolute inset-y-0 right-2 flex items-center text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 focus:outline-none"
+              >
+                {showPass ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </LabelInputContainer>
 
           <button

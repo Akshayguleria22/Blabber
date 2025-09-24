@@ -2,9 +2,9 @@
 "use client";;
 import * as React from "react";
 import { cn } from "../../lib/utils";
-import { useMotionTemplate, useMotionValue, motion } from "motion/react";
+import { useMotionTemplate, useMotionValue, motion } from "motion/react"; // motion is actually used as a component wrapper
 
-const Input = React.forwardRef(({ className, type, ...props }, ref) => {
+const Input = React.forwardRef(({ className, type, containerClassName, ...props }, ref) => {
     const radius = 100; // change this to increase the rdaius of the hover effect
     const [visible, setVisible] = React.useState(false);
 
@@ -35,7 +35,7 @@ const Input = React.forwardRef(({ className, type, ...props }, ref) => {
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setVisible(true)}
             onMouseLeave={() => setVisible(false)}
-            className="group/input rounded-lg p-[2px] transition duration-300">
+            className={cn("group/input rounded-lg p-[2px] transition duration-300", containerClassName)}>
             <input
                 type={type}
                 className={cn(

@@ -4,6 +4,11 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as GitHubStrategy } from "passport-github2";
 import User from "../models/user.model.js"; // adjust path if needed
 
+// Use consistent base server URL for callback construction
+const SERVER_URL = process.env.SERVER_URL || (process.env.NODE_ENV === 'production'
+  ? 'https://blabber-5anu-backend.onrender.com'
+  : 'http://localhost:5000');
+
 const requireEnv = (k) => {
   if (!process.env[k]) throw new Error(`Missing env: ${k}`);
   return process.env[k];
@@ -15,7 +20,7 @@ passport.use(
     {
       clientID: requireEnv("GOOGLE_CLIENT_ID"),
       clientSecret: requireEnv("GOOGLE_CLIENT_SECRET"),
-      callbackURL: `${process.env.SERVER_URL || "http://localhost:5000"}/api/auth/google/callback`,
+      callbackURL: `${SERVER_URL}/api/auth/google/callback`,
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
@@ -55,7 +60,7 @@ passport.use(
     {
       clientID: requireEnv("GITHUB_CLIENT_ID"),
       clientSecret: requireEnv("GITHUB_CLIENT_SECRET"),
-      callbackURL: `${process.env.SERVER_URL || "http://localhost:5000"}/api/auth/github/callback`,
+      callbackURL: `${SERVER_URL}/api/auth/github/callback`,
       scope: ["user:email"],
     },
     async (_accessToken, _refreshToken, profile, done) => {

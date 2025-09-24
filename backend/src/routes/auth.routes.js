@@ -10,6 +10,10 @@ import {
 } from '../controllers/auth.controllers.js'
 import { authorize } from '../middlewares/auth.middlewares.js'
 
+const CLIENT_URL = process.env.CLIENT_URL || (process.env.NODE_ENV === 'production'
+    ? 'https://blabber-5anu.onrender.com'
+    : 'http://localhost:5173');
+
 
 const authRouter = express.Router()
 authRouter.post('/signup', signUpController)
@@ -25,7 +29,10 @@ authRouter.get('/google',
 )
 
 authRouter.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/login?error=google`, session: false }),
+    passport.authenticate('google', {
+        failureRedirect: `${CLIENT_URL}/login?error=google`,
+        session: false
+    }),
     oauthSuccessController
 )
 
@@ -34,7 +41,10 @@ authRouter.get('/github',
 )
 
 authRouter.get('/github/callback',
-    passport.authenticate('github', { failureRedirect: `${process.env.CLIENT_URL || "http://localhost:5173"}/login?error=github`, session: false }),
+    passport.authenticate('github', {
+        failureRedirect: `${CLIENT_URL}/login?error=github`,
+        session: false
+    }),
     oauthSuccessController
 )
 

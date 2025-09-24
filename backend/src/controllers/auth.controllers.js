@@ -3,6 +3,11 @@ import User from '../models/user.model.js'
 import { generateToken } from '../lib/db.js';
 import cloudinary from '../lib/cloudinary.js';
 
+// Centralized client URL (avoid scattering localhost in production builds)
+const CLIENT_URL = process.env.CLIENT_URL || (process.env.NODE_ENV === 'production'
+    ? 'https://blabber-5anu.onrender.com'
+    : 'http://localhost:5173');
+
 
 
 export const signUpController = async (req, res) => {
@@ -108,11 +113,9 @@ export const checkAuth = (req, res) => {
 }
 
 export const oauthSuccessController = (req, res) => {
-    // user is set by passport strategy
     const user = req.user;
-    if (!user) return res.redirect(`${process.env.CLIENT_URL || "http://localhost:5173"}/login?error=oauth`);
+    if (!user) return res.redirect(`${CLIENT_URL}/login?error=oauth`);
     generateToken(user._id, res);
-    // redirect back to app
-    const to = process.env.CLIENT_URL || "http://localhost:5173";
-    return res.redirect(to);
+    // Optionally land on dashboard or root
+    return res.redirect(`${CLIENT_URL}/dashboard`);
 };

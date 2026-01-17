@@ -19,7 +19,7 @@ const PORT = ENV.PORT || 3000;
 const isDev = ENV.NODE_ENV !== "production";
 const clientUrls = [
   ENV.CLIENT_URL,
-  ...(ENV.CLIENT_URLS ? ENV.CLIENT_URLS.split(",") : []),
+  ...(ENV.CLIENT_URL ? ENV.CLIENT_URL.split(",") : []),
 ].map((url) => url.trim()).filter(Boolean);
 
 const allowedOrigins = new Set(

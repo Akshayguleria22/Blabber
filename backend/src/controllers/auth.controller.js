@@ -91,6 +91,9 @@ export const login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user.password) {
+      return res.status(400).json({ message: "Please sign in with Google or GitHub" });
+    }
     // never tell the client which one is incorrect: password or email
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);

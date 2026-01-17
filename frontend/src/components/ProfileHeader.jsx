@@ -1,13 +1,10 @@
 import { useState, useRef } from "react";
-import { LogOutIcon, VolumeOffIcon, Volume2Icon } from "lucide-react";
+import { LogOutIcon, CameraIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { useChatStore } from "../store/useChatStore";
 
-const mouseClickSound = new Audio("/sounds/mouse-click.mp3");
 
 function ProfileHeader() {
   const { logout, authUser, updateProfile } = useAuthStore();
-  const { isSoundEnabled, toggleSound } = useChatStore();
   const [selectedImg, setSelectedImg] = useState(null);
 
   const fileInputRef = useRef(null);
@@ -27,25 +24,28 @@ function ProfileHeader() {
   };
 
   return (
-    <div className="p-6 border-b border-slate-700/50">
+    <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border))]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          {/* AVATAR */}
-          <div className="avatar online">
+          <div className="relative">
             <button
-              className="size-14 rounded-full overflow-hidden relative group"
+              className="size-12 rounded-2xl overflow-hidden border border-[rgb(var(--border))] bg-[rgb(var(--surface-2))] group"
               onClick={() => fileInputRef.current.click()}
             >
               <img
                 src={selectedImg || authUser.profilePic || "/avatar.png"}
                 alt="User image"
                 className="size-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/avatar.png";
+                }}
               />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                <span className="text-white text-xs">Change</span>
+              <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <CameraIcon className="size-4 text-white" />
               </div>
             </button>
 
+            <span className="absolute -bottom-1 -right-1 size-3 rounded-full bg-[rgb(var(--success))] border-2 border-[rgb(var(--surface-1))]" />
             <input
               type="file"
               accept="image/*"
@@ -55,43 +55,20 @@ function ProfileHeader() {
             />
           </div>
 
-          {/* USERNAME & ONLINE TEXT */}
           <div>
-            <h3 className="text-slate-200 font-medium text-base max-w-[180px] truncate">
-              {authUser.fullName}
+            <h3 className="text-[rgb(var(--text))] font-semibold text-sm max-w-[180px] truncate">
+              {authUser.fullName || "Unnamed user"}
             </h3>
-
-            <p className="text-slate-400 text-xs">Online</p>
+            <p className="text-[rgb(var(--muted))] text-xs">Online</p>
           </div>
         </div>
 
-        {/* BUTTONS */}
-        <div className="flex gap-4 items-center">
-          {/* LOGOUT BTN */}
-          <button
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-            onClick={logout}
-          >
-            <LogOutIcon className="size-5" />
-          </button>
-
-          {/* SOUND TOGGLE BTN */}
-          <button
-            className="text-slate-400 hover:text-slate-200 transition-colors"
-            onClick={() => {
-              // play click sound before toggling
-              mouseClickSound.currentTime = 0; // reset to start
-              mouseClickSound.play().catch((error) => console.log("Audio play failed:", error));
-              toggleSound();
-            }}
-          >
-            {isSoundEnabled ? (
-              <Volume2Icon className="size-5" />
-            ) : (
-              <VolumeOffIcon className="size-5" />
-            )}
-          </button>
-        </div>
+        <button
+          className="text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition-colors"
+          onClick={logout}
+        >
+          <LogOutIcon className="size-5" />
+        </button>
       </div>
     </div>
   );

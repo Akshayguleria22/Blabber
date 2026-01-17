@@ -6,9 +6,10 @@ import User from "../models/User.js";
 export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    const me = await User.findById(loggedInUserId).select("friends");
 
-    res.status(200).json(filteredUsers);
+    const friends = await User.find({ _id: { $in: me.friends || [] } }).select("-password");
+    res.status(200).json(friends);
   } catch (error) {
     console.log("Error in getAllContacts:", error);
     res.status(500).json({ message: "Server error" });
@@ -19,6 +20,12 @@ export const getMessagesByUserId = async (req, res) => {
   try {
     const myId = req.user._id;
     const { id: userToChatId } = req.params;
+
+    const me = await User.findById(myId).select("friends");
+    const isFriend = (me.friends || []).some((id) => id.toString() === userToChatId.toString());
+    if (!isFriend) {
+      return res.status(403).json({ message: "You can only view messages with friends" });
+    }
 
     const messages = await Message.find({
       $or: [
@@ -49,6 +56,12 @@ export const sendMessage = async (req, res) => {
     const receiverExists = await User.exists({ _id: receiverId });
     if (!receiverExists) {
       return res.status(404).json({ message: "Receiver not found." });
+    }
+
+    const me = await User.findById(senderId).select("friends");
+    const isFriend = (me.friends || []).some((id) => id.toString() === receiverId.toString());
+    if (!isFriend) {
+      return res.status(403).json({ message: "You can only message accepted friends" });
     }
 
     let imageUrl;
@@ -98,7 +111,11 @@ export const getChatPartners = async (req, res) => {
       ),
     ];
 
-    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+    const me = await User.findById(loggedInUserId).select("friends");
+    const friendsSet = new Set((me.friends || []).map((id) => id.toString()));
+
+    const friendChatPartnerIds = chatPartnerIds.filter((id) => friendsSet.has(id));
+    const chatPartners = await User.find({ _id: { $in: friendChatPartnerIds } }).select("-password");
 
     res.status(200).json(chatPartners);
   } catch (error) {

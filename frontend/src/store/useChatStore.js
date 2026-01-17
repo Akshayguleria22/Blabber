@@ -5,29 +5,86 @@ import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
   allContacts: [],
+  friends: [],
+  friendRequests: [],
   chats: [],
   messages: [],
   activeTab: "chats",
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
-  isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
-
-  toggleSound: () => {
-    localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
-    set({ isSoundEnabled: !get().isSoundEnabled });
-  },
 
   setActiveTab: (tab) => set({ activeTab: tab }),
   setSelectedUser: (selectedUser) => set({ selectedUser }),
 
+  searchUsers: async (q) => {
+    try {
+      const res = await axiosInstance.get(`friends/search?q=${encodeURIComponent(q)}`);
+      return res.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to search users");
+      return [];
+    }
+  },
+
+  getFriends: async () => {
+    set({ isUsersLoading: true });
+    try {
+      const res = await axiosInstance.get("friends/list");
+      set({ friends: res.data });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to load friends");
+    } finally {
+      set({ isUsersLoading: false });
+    }
+  },
+
+  getFriendRequests: async () => {
+    try {
+      const res = await axiosInstance.get("friends/requests");
+      set({ friendRequests: res.data });
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to load friend requests");
+    }
+  },
+
+  sendFriendRequest: async (userId) => {
+    try {
+      await axiosInstance.post(`friends/request/${userId}`);
+      toast.success("Request sent");
+      await get().getFriendRequests();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to send request");
+    }
+  },
+
+  acceptFriendRequest: async (userId) => {
+    try {
+      await axiosInstance.post(`friends/accept/${userId}`);
+      toast.success("Request accepted");
+      await Promise.all([get().getFriends(), get().getFriendRequests()]);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to accept request");
+    }
+  },
+
+  rejectFriendRequest: async (userId) => {
+    try {
+      await axiosInstance.post(`friends/reject/${userId}`);
+      toast.success("Request rejected");
+      await get().getFriendRequests();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to reject request");
+    }
+  },
+
   getAllContacts: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/contacts");
+      const res = await axiosInstance.get("messages/contacts");
       set({ allContacts: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Failed to load contacts");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -35,10 +92,10 @@ export const useChatStore = create((set, get) => ({
   getMyChatPartners: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/chats");
+      const res = await axiosInstance.get("messages/chats");
       set({ chats: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error?.response?.data?.message || "Failed to load chats");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -47,7 +104,7 @@ export const useChatStore = create((set, get) => ({
   getMessagesByUserId: async (userId) => {
     set({ isMessagesLoading: true });
     try {
-      const res = await axiosInstance.get(`/messages/${userId}`);
+      const res = await axiosInstance.get(`messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
@@ -75,7 +132,7 @@ export const useChatStore = create((set, get) => ({
     set({ messages: [...messages, optimisticMessage] });
 
     try {
-      const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+      const res = await axiosInstance.post(`messages/send/${selectedUser._id}`, messageData);
       set({ messages: messages.concat(res.data) });
     } catch (error) {
       // remove optimistic message on failure

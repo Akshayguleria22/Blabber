@@ -20,6 +20,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    bio: {
+      type: String,
+      default: "",
+      maxlength: 280,
+    },
+
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsReceived: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsSent: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true } // createdAt & updatedAt
 );

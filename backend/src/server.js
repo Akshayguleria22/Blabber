@@ -17,9 +17,14 @@ const __dirname = path.dirname(__filename);
 const PORT = ENV.PORT || 3000;
 
 const isDev = ENV.NODE_ENV !== "production";
+const clientUrls = [
+  ENV.CLIENT_URL,
+  ...(ENV.CLIENT_URLS ? ENV.CLIENT_URLS.split(",") : []),
+].map((url) => url.trim()).filter(Boolean);
+
 const allowedOrigins = new Set(
   [
-    ENV.CLIENT_URL,
+    ...clientUrls,
     ...(isDev ? ["http://localhost:5173", "http://localhost:5174"] : []),
   ].filter(Boolean)
 );

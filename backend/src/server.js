@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import cors from "cors";
 
@@ -19,8 +20,10 @@ const PORT = ENV.PORT || 3000;
 const isDev = ENV.NODE_ENV !== "production";
 const clientUrls = [
   ENV.CLIENT_URL,
-  ...(ENV.CLIENT_URL ? ENV.CLIENT_URL.split(",") : []),
-].map((url) => url.trim()).filter(Boolean);
+  ...(ENV.CLIENT_URLS ? ENV.CLIENT_URLS.split(",") : []),
+]
+  .map((url) => url.trim())
+  .filter(Boolean);
 
 const allowedOrigins = new Set(
   [
@@ -51,11 +54,13 @@ app.use("/api/friends", friendRoutes);
 // make ready for deployment
 if (ENV.NODE_ENV === "production") {
   const frontendDist = path.join(__dirname, "../../frontend/dist");
-  app.use(express.static(frontendDist));
+  if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
 
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(frontendDist, "index.html"));
-  });
+    app.get("*", (_, res) => {
+      res.sendFile(path.join(frontendDist, "index.html"));
+    });
+  }
 }
 
 server.listen(PORT, () => {

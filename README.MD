@@ -42,9 +42,15 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
 ARCJET_KEY=your_arcjet_key
 ARCJET_ENV=development
 
+# Optional: allow multiple frontend origins (comma-separated)
+CLIENT_URLS=https://your-frontend.vercel.app,https://www.yourdomain.com
+```
+
 ### Frontend (`/frontend`)
 
+```bash
 VITE_API_BASE=http://localhost:3000
+```
 
 ```
 
@@ -71,3 +77,4 @@ npm run dev
 1) Backend: deploy on Render/Railway/Fly/VM and set backend `.env` values.
 2) Frontend: deploy `frontend/dist` to Vercel/Netlify/Static host.
 3) Set `VITE_API_BASE` in the frontend host to your backend URL.
+4) In backend env, set `CLIENT_URL` and `CLIENT_URLS` to your deployed frontend URL(s).

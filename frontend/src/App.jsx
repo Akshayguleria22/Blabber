@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -16,11 +16,21 @@ import SiteHeader from "./components/SiteHeader";
 function App() {
   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
   const location = useLocation();
+  const navigate = useNavigate();
   const MotionRoute = motion.div;
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isCheckingAuth) {
+      const params = new URLSearchParams(location.search);
+      if (params.has("oauth") && authUser) {
+        navigate("/chat", { replace: true });
+      }
+    }
+  }, [isCheckingAuth, authUser, location.search, navigate]);
 
   if (isCheckingAuth) return <PageLoader />;
 

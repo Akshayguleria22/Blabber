@@ -12,9 +12,13 @@ const getBaseUrl = (req) => {
   return `${proto}://${host}`;
 };
 
-const oauthRedirect = (res) => {
+const oauthRedirect = (res, opts = {}) => {
   const base = ENV.CLIENT_URL ? ENV.CLIENT_URL.replace(/\/+$/, "") : "";
-  const target = base || "/";
+  let target = base || "/";
+  if (opts.oauth) {
+    const sep = target.includes("?") ? "&" : "?";
+    target = `${target}${sep}oauth=1`;
+  }
   return res.redirect(target);
 };
 
@@ -230,7 +234,7 @@ export const googleCallback = async (req, res) => {
     }
 
     generateToken(user._id, res);
-    return oauthRedirect(res);
+    return oauthRedirect(res, { oauth: true });
   } catch (error) {
     console.log("Error in googleCallback:", error);
     res.status(500).json({ message: "OAuth error" });
@@ -320,7 +324,7 @@ export const githubCallback = async (req, res) => {
     }
 
     generateToken(user._id, res);
-    return oauthRedirect(res);
+    return oauthRedirect(res, { oauth: true });
   } catch (error) {
     console.log("Error in githubCallback:", error);
     res.status(500).json({ message: "OAuth error" });

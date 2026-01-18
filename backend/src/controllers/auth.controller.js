@@ -7,15 +7,14 @@ import cloudinary from "../lib/cloudinary.js";
 import crypto from "crypto";
 
 const getBaseUrl = (req) => {
-  if (ENV.SERVER_URL) return ENV.SERVER_URL.replace(/\/+$/, "");
-
   const proto = (req.headers["x-forwarded-proto"] || req.protocol || "http").toString();
   const host = (req.headers["x-forwarded-host"] || req.get("host") || "localhost:3000").toString();
   return `${proto}://${host}`;
 };
 
 const oauthRedirect = (res) => {
-  const target = ENV.CLIENT_URL ? `${ENV.CLIENT_URL}/chat` : "/";
+  const base = ENV.CLIENT_URL ? ENV.CLIENT_URL.replace(/\/+$/, "") : "";
+  const target = base || "/";
   return res.redirect(target);
 };
 
